@@ -10,11 +10,15 @@ accomplish, without worrying too much about how things are structured or whether
 right now is to get a functioning app in place, and as large features come together, I'll look secondarily at
 reorganizing the code. Things are going to be sloppy for awhile as I attempt to mentally map everything.
 """
+from flask import Flask
+
+app = Flask(__name__)
 
 
+@app.route('/')
 def main():
-    print('Hello, world!')
+    return 'Welcome to the home of bgg-slackbot!'
 
 
 if __name__ == "__main__":
-    main()
+    app.run()
