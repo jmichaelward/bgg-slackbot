@@ -11,13 +11,20 @@ right now is to get a functioning app in place, and as large features come toget
 reorganizing the code. Things are going to be sloppy for awhile as I attempt to mentally map everything.
 """
 from flask import Flask
+import bgg.api
 
 app = Flask(__name__)
+bgg_api = bgg.api.BoardGameGeek()
 
 
 @app.route('/')
 def main():
     return 'Welcome to the home of bgg-slackbot!'
+
+
+@app.route('/api')
+def api():
+    return bgg_api.get_collection('thegermwar')
 
 
 if __name__ == "__main__":
