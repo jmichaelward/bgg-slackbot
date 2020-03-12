@@ -10,7 +10,7 @@ accomplish, without worrying too much about how things are structured or whether
 right now is to get a functioning app in place, and as large features come together, I'll look secondarily at
 reorganizing the code. Things are going to be sloppy for awhile as I attempt to mentally map everything.
 """
-from flask import Flask
+from flask import Flask, jsonify, request
 import bgg.api
 
 app = Flask(__name__)
@@ -20,6 +20,17 @@ bgg_api = bgg.api.BoardGameGeek()
 @app.route('/')
 def main():
     return 'Welcome to the home of bgg-slackbot!'
+
+
+@app.route('/slack/challenge', methods=['POST'])
+def slack():
+    data = request.get_json()
+
+    # @TODO Verify this Slack request. See: https://api.slack.com/events/url_verification
+    return jsonify({
+        'Content-type': 'application/json',
+        'challenge': data['challenge']
+    })
 
 
 @app.route('/api')
