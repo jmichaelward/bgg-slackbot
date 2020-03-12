@@ -11,6 +11,7 @@ right now is to get a functioning app in place, and as large features come toget
 reorganizing the code. Things are going to be sloppy for awhile as I attempt to mentally map everything.
 """
 from flask import Flask, jsonify, request
+from bgg.CommandHandler import CommandHandler
 import bgg.api
 
 app = Flask(__name__)
@@ -33,9 +34,9 @@ def slack():
     })
 
 
-@app.route('/api')
-def api():
-    return bgg_api.get_collection('thegermwar')
+@app.route('/bgg', methods=['POST'])
+def bgg_command():
+    return CommandHandler(request.form).handle()
 
 
 if __name__ == "__main__":
