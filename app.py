@@ -10,10 +10,14 @@ accomplish, without worrying too much about how things are structured or whether
 right now is to get a functioning app in place, and as large features come together, I'll look secondarily at
 reorganizing the code. Things are going to be sloppy for awhile as I attempt to mentally map everything.
 """
-from flask import Flask, jsonify, request
+import os
+from dotenv import load_dotenv
+from flask import Flask, jsonify, json, request
+import requests
 from bgg.CommandHandler import CommandHandler
 import bgg.api
 
+load_dotenv()
 app = Flask(__name__)
 bgg_api = bgg.api.BoardGameGeek()
 
@@ -36,7 +40,25 @@ def slack():
 
 @app.route('/bgg', methods=['POST'])
 def bgg_command():
-    return CommandHandler(request.form).handle()
+    form = request.form
+    bgg_response = CommandHandler(form).handle()
+
+    if not bgg_response:
+        return 'Could not get response.'
+
+    try:
+        payload = {"text": bgg_response}
+        response = requests.post(
+            os.getenv('SLACKBOT_WEBHOOK_URL'),
+            data=json.dumps(payload),
+            headers={
+                'Authorization': 'Bearer ' + os.getenv('SLACKBOT_ACCESS_TOKEN')
+            }
+        )
+
+        return ''
+    except TypeError:
+        return "There was an error processing the request."
 
 
 if __name__ == "__main__":

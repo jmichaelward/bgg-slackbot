@@ -6,10 +6,12 @@ Accepts and processes commands requested by users in Slack.
 Commands:
 - latest [username]: get the latest game played by a particular BoardGameGeek user.
 """
+from flask import jsonify
 
 
 class CommandHandler:
     def __init__(self, data):
+        self.bgg = BoardGameGeek()
         self.data = data
         self.command_string = data['text']
         self.command = self.__get_command_name()
@@ -26,6 +28,8 @@ class CommandHandler:
 
         if 'latest' == command:
             return self.get_latest(arguments)
+        elif 'hot' == command:
+            return self.get_hot(arguments)
 
         return 'Command not found.'
 
@@ -36,6 +40,9 @@ class CommandHandler:
         data = self.command_string.split(' ', maxsplit=1)
 
         return data[1] if 2 == len(data) else ''
+
+    def get_hot(self, data):
+        return self.bgg.get_hotness()
 
     def get_latest(self, data):
         if 0 == len(data):

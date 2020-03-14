@@ -7,6 +7,7 @@ up for now so they can act as the data source for particular Slack commands.
 from flask import jsonify
 from urllib.request import urlopen
 import xmltodict
+import sys
 
 
 class BoardGameGeek:
@@ -32,4 +33,20 @@ class BoardGameGeek:
         for game in data['items']['item']:
             games.append(game['name']['#text'])
 
-        return jsonify(games)
+        return '\n'.join(games)
+
+    def get_hotness(self):
+        """Get the Top 10 games from BGG's Hotness list."""
+
+        request = urlopen(self.base_url + 'hot?type=boardgame')
+        data = xmltodict.parse(request.read())
+        games = []
+
+        for game in data['items']['item']:
+            games.append(game['name']['@value'])
+
+            if len(games) == 10:
+                break
+
+        return '```' + '\n'.join(games) + '```'
+
