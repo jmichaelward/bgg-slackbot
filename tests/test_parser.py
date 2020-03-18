@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-import pytest
-from bgg.commands import my_first_test
+# Tests for the slack/parser module.
+
+from slack.parser import *
 
 
-def test_my_first_test():
-    assert my_first_test()
+def test_it_strips_a_username():
+    text = "<@UVD0SF9M5> latest thegermwar"
+
+    assert strip_username(text) == "latest thegermwar"

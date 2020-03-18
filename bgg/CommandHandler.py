@@ -6,14 +6,14 @@ Accepts and processes commands requested by users in Slack.
 Commands:
 - latest [username]: get the latest game played by a particular BoardGameGeek user.
 """
-from flask import jsonify
+from slack.parser import *
 
 
 class CommandHandler:
     def __init__(self, data):
         self.bgg = BoardGameGeek()
         self.data = data
-        self.command_string = data['event']['text']
+        self.command_string = strip_username(data['event']['text'])
         self.command = self.__get_command_name()
         self.command_args = self.__get_command_args()
 
