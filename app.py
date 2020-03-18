@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """
 bgg-slackbot - a BoardGameGeek bot for Slack!
 
