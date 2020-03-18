@@ -29,38 +29,52 @@ def main():
     return 'Welcome to the home of bgg-slackbot!'
 
 
-@app.route('/slack/challenge', methods=['POST'])
+@app.route('/slack', methods=['POST'])
 def slack():
     data = request.get_json()
+    challenge_token = data.get('challenge')
+
+    if not challenge_token:
+        return bgg_command(data)
 
     # @TODO Verify this Slack request. See: https://api.slack.com/events/url_verification
     return jsonify({
         'Content-type': 'application/json',
-        'challenge': data['challenge']
+        'challenge': challenge_token
     })
 
 
-@app.route('/bgg', methods=['POST'])
-def bgg_command():
-    form = request.form
-    bgg_response = CommandHandler(form).handle()
+def bgg_command(data):
+    # @TODO Verify token from Slack.
+    if not has_valid_token(data):
+        return ''
+
+    bgg_response = CommandHandler(data).handle()
 
     if not bgg_response:
-        return 'Could not get response.'
+        return ''
 
     try:
-        payload = {"text": bgg_response}
-        response = requests.post(
-            os.getenv('SLACKBOT_WEBHOOK_URL'),
-            data=json.dumps(payload),
-            headers={
-                'Authorization': 'Bearer ' + os.getenv('SLACKBOT_ACCESS_TOKEN')
-            }
-        )
-
-        return ''
+        return create_response({"text": bgg_response})
     except TypeError:
-        return "There was an error processing the request."
+        return ''
+
+
+def create_response(payload):
+    requests.post(
+        os.getenv('SLACKBOT_WEBHOOK_URL'),
+        data=json.dumps(payload),
+        headers={
+            'Authorization': 'Bearer ' + os.getenv('SLACKBOT_ACCESS_TOKEN')
+        }
+    )
+
+    return ''
+
+
+# @TODO Figure out how to validate the token provided by Slack.
+def has_valid_token(data):
+    return True
 
 
 if __name__ == "__main__":
